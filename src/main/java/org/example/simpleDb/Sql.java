@@ -45,21 +45,31 @@ public class Sql {
     }
 
     public int update() {
-        int id =-1;
+        int rowCnt =0;
         try(PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
             for(int i = 0; i < argsList.size(); i++)
                 pstmt.setObject(i+1, argsList.get(i));
 
-            id = pstmt.executeUpdate();
+            rowCnt = pstmt.executeUpdate();
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return id;
+        return rowCnt;
     }
 
     public int delete() {
-        return 0;
+        int rowCnt =0;
+        try(PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
+            for(int i = 0; i < argsList.size(); i++)
+                pstmt.setObject(i+1, argsList.get(i));
+
+            rowCnt = pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rowCnt;
     }
 
     public List<Map<String, Object>> selectRows() {
