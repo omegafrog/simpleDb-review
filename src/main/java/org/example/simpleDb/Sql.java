@@ -45,8 +45,17 @@ public class Sql {
     }
 
     public int update() {
-        return 0;
+        int id =-1;
+        try(PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
+            for(int i = 0; i < argsList.size(); i++)
+                pstmt.setObject(i+1, argsList.get(i));
 
+            id = pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
     }
 
     public int delete() {
