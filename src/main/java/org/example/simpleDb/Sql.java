@@ -1,21 +1,47 @@
 package org.example.simpleDb;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class Sql {
+    private final Connection conn;
+    private StringBuilder s = new StringBuilder();
+    private List<Object> argsList = new ArrayList<>();
+
+    public Sql(Connection conn) {
+        this.conn = conn;
+    }
+
     public Sql append(String statement) {
-        return null;
+        s.append(statement).append(" ");
+        return this;
     }
 
     public Sql append(String statement, Object... args) {
-        return null;
-
+        s.append(statement);
+        argsList.addAll(Arrays.asList(args));
+        return this;
     }
 
     public long insert() {
-        return 0;
+        int id = 0;
+        try(PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
+            for(int i = 0; i < argsList.size(); i++)
+                pstmt.setObject(i+1, argsList.get(i));
+
+            id = pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return id;
     }
 
     public int update() {

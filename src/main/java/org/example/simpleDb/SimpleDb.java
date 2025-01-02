@@ -22,8 +22,6 @@ public class SimpleDb {
 
     public void run(String statement, Object... args) {
         try(PreparedStatement pstmt = conn.prepareStatement(statement)) {
-            int fromIdx = 0;
-            int argsNum = 0;
             List<Object> argsList = Arrays.asList(args);
             if(argsList.isEmpty() || argsList.size()!=args.length)
                 throw new IllegalArgumentException("인수가 잘못 입력되었습니다.");
@@ -46,7 +44,7 @@ public class SimpleDb {
     }
 
     public Sql genSql() {
-        return null;
+        return new Sql(this.conn);
     }
 
     public void close() {
