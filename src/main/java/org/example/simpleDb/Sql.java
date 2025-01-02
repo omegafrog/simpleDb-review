@@ -2,10 +2,7 @@ package org.example.simpleDb;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -85,8 +82,8 @@ public class Sql {
                 rows.add(Map.of("id", rs.getLong("id")));
                 rows.add(Map.of("title", rs.getString("title")));
                 rows.add(Map.of("body", rs.getString("body")));
-                rows.add(Map.of("createdDate", rs.getDate("createdDate")));
-                rows.add(Map.of("modifiedDate", rs.getDate("modifiedDate")));
+                rows.add(Map.of("createdDate", rs.getTimestamp("createdDate").toLocalDateTime()));
+                rows.add(Map.of("modifiedDate", rs.getTimestamp("modifiedDate").toLocalDateTime()));
                 rows.add(Map.of("blind", rs.getBoolean("blind")));
             }
             return rows;
@@ -107,6 +104,14 @@ public class Sql {
     }
 
     public LocalDateTime selectDatetime() {
+        try(Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery("SELECT NOW();");
+            while(rs.next()){
+                return rs.getTimestamp(1).toLocalDateTime();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
