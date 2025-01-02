@@ -1,5 +1,8 @@
 package org.example.simpleDb;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +14,9 @@ public class SimpleDb {
     private final static Integer MAX_CONNECTION = 10;
     private final Connection conn;
     private boolean devMode = false;
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule());
+
     public SimpleDb(String localhost, String username, String password, String schema) throws SQLException {
         conn = DriverManager.getConnection(DB_URL+localhost+"/"+schema, username, password);
     }
@@ -43,7 +49,7 @@ public class SimpleDb {
     }
 
     public Sql genSql() {
-        return new Sql(this.conn);
+        return new Sql(this.conn, this.objectMapper);
     }
 
     public void close() {

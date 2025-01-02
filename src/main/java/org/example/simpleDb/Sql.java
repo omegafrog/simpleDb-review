@@ -1,22 +1,24 @@
 package org.example.simpleDb;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Sql {
     private final Connection conn;
+    private final ObjectMapper objectMapper;
     private StringBuilder s = new StringBuilder();
     private List<Object> argsList = new ArrayList<>();
 
-    public Sql(Connection conn) {
+
+    public Sql(Connection conn, ObjectMapper objectMapper) {
         this.conn = conn;
+        this.objectMapper = objectMapper;
     }
 
     public Sql append(String statement) {
@@ -73,7 +75,25 @@ public class Sql {
     }
 
     public List<Map<String, Object>> selectRows() {
-        return null;
+        try(PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
+            for(int i = 0; i < argsList.size(); i++)
+                pstmt.setObject(i+1, argsList.get(i));
+
+            ResultSet rs = pstmt.executeQuery();
+            List<Map<String, Object>> rows = new ArrayList<>();
+            while(rs.next()){
+                rows.add(Map.of("id", rs.getLong("id")));
+                rows.add(Map.of("title", rs.getString("title")));
+                rows.add(Map.of("body", rs.getString("body")));
+                rows.add(Map.of("createdDate", rs.getDate("createdDate")));
+                rows.add(Map.of("modifiedDate", rs.getDate("modifiedDate")));
+                rows.add(Map.of("blind", rs.getBoolean("blind")));
+            }
+            return rows;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
     }
     public <T> List<T> selectRows(Class<T> className) {
         return null;
