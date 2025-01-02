@@ -2,6 +2,7 @@ package org.example.simpleDb;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -22,19 +23,15 @@ public class SimpleDb {
     public void run(String statement, Object... args) {
         try(PreparedStatement pstmt = conn.prepareStatement(statement)) {
             int fromIdx = 0;
-            List<Object> argsList = new ArrayList<>();
-            while(fromIdx < statement.length()) {
-                argsList.add(statement.indexOf("?", fromIdx));
-                fromIdx++;
-            }
-
+            int argsNum = 0;
+            List<Object> argsList = Arrays.asList(args);
             if(argsList.isEmpty() || argsList.size()!=args.length)
                 throw new IllegalArgumentException("인수가 잘못 입력되었습니다.");
 
             for(int i = 0; i < argsList.size(); i++)
-                pstmt.setObject(i+1, argsList.get(i));
+                pstmt.setObject(i+1, args[i]);
 
-            pstmt.execute(statement);
+            pstmt.execute();
 
         } catch (SQLException e) {
             e.printStackTrace();
