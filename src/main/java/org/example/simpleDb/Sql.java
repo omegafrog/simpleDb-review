@@ -31,9 +31,9 @@ public class Sql {
 
     public long insert() {
         int id = 0;
-        try(PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
-            for(int i = 0; i < argsList.size(); i++)
-                pstmt.setObject(i+1, argsList.get(i));
+        try (PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
+            for (int i = 0; i < argsList.size(); i++)
+                pstmt.setObject(i + 1, argsList.get(i));
 
             id = pstmt.executeUpdate();
 
@@ -44,10 +44,10 @@ public class Sql {
     }
 
     public int update() {
-        int rowCnt =0;
-        try(PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
-            for(int i = 0; i < argsList.size(); i++)
-                pstmt.setObject(i+1, argsList.get(i));
+        int rowCnt = 0;
+        try (PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
+            for (int i = 0; i < argsList.size(); i++)
+                pstmt.setObject(i + 1, argsList.get(i));
 
             rowCnt = pstmt.executeUpdate();
 
@@ -58,10 +58,10 @@ public class Sql {
     }
 
     public int delete() {
-        int rowCnt =0;
-        try(PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
-            for(int i = 0; i < argsList.size(); i++)
-                pstmt.setObject(i+1, argsList.get(i));
+        int rowCnt = 0;
+        try (PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
+            for (int i = 0; i < argsList.size(); i++)
+                pstmt.setObject(i + 1, argsList.get(i));
 
             rowCnt = pstmt.executeUpdate();
 
@@ -72,19 +72,19 @@ public class Sql {
     }
 
     public List<Map<String, Object>> selectRows() {
-        try(PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
-            for(int i = 0; i < argsList.size(); i++)
-                pstmt.setObject(i+1, argsList.get(i));
+        try (PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
+            for (int i = 0; i < argsList.size(); i++)
+                pstmt.setObject(i + 1, argsList.get(i));
 
             ResultSet rs = pstmt.executeQuery();
             List<Map<String, Object>> rows = new ArrayList<>();
-            while(rs.next()){
-                rows.add(Map.of("id", rs.getLong("id")));
-                rows.add(Map.of("title", rs.getString("title")));
-                rows.add(Map.of("body", rs.getString("body")));
-                rows.add(Map.of("createdDate", rs.getTimestamp("createdDate").toLocalDateTime()));
-                rows.add(Map.of("modifiedDate", rs.getTimestamp("modifiedDate").toLocalDateTime()));
-                rows.add(Map.of("blind", rs.getBoolean("blind")));
+            while (rs.next()) {
+                rows.add(Map.of("id", rs.getLong("id"),
+                        "title", rs.getString("title"),
+                        "body", rs.getString("body"),
+                        "createdDate", rs.getTimestamp("createdDate").toLocalDateTime(),
+                        "modifiedDate", rs.getTimestamp("modifiedDate").toLocalDateTime(),
+                        "isBlind", rs.getBoolean("isBlind")));
             }
             return rows;
         } catch (SQLException e) {
@@ -92,21 +92,41 @@ public class Sql {
         }
         return new ArrayList<>();
     }
+
     public <T> List<T> selectRows(Class<T> className) {
         return null;
     }
 
     public Map<String, Object> selectRow() {
+        try (PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
+            for (int i = 0; i < argsList.size(); i++)
+                pstmt.setObject(i + 1, argsList.get(i));
+
+            ResultSet rs = pstmt.executeQuery();
+            Map<String, Object> row = new HashMap<>();
+            while (rs.next()) {
+                row.put("id", rs.getLong("id"));
+                row.put("title", rs.getString("title"));
+                row.put("body", rs.getString("body"));
+                row.put("createdDate", rs.getTimestamp("createdDate").toLocalDateTime());
+                row.put("modifiedDate", rs.getTimestamp("modifiedDate").toLocalDateTime());
+                row.put("isBlind", rs.getBoolean("isBlind"));
+            }
+            return row;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
+
     public <T> T selectRow(Class<T> className) {
         return null;
     }
 
     public LocalDateTime selectDatetime() {
-        try(Statement stmt = conn.createStatement()) {
+        try (Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(s.toString());
-            while(rs.next()){
+            while (rs.next()) {
                 return rs.getTimestamp(1).toLocalDateTime();
             }
         } catch (SQLException e) {
@@ -116,9 +136,9 @@ public class Sql {
     }
 
     public Long selectLong() {
-        try(Statement stmt = conn.createStatement()) {
+        try (Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(s.toString());
-            while(rs.next()){
+            while (rs.next()) {
                 return rs.getLong(1);
             }
         } catch (SQLException e) {
@@ -128,9 +148,9 @@ public class Sql {
     }
 
     public String selectString() {
-        try(Statement stmt = conn.createStatement()) {
+        try (Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(s.toString());
-            while(rs.next()){
+            while (rs.next()) {
                 return rs.getString(1);
             }
         } catch (SQLException e) {
@@ -140,9 +160,9 @@ public class Sql {
     }
 
     public Boolean selectBoolean() {
-        try(Statement stmt = conn.createStatement()) {
+        try (Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(s.toString());
-            while(rs.next()){
+            while (rs.next()) {
                 return rs.getBoolean(1);
             }
         } catch (SQLException e) {

@@ -8,7 +8,7 @@ public class Article {
     private  String body;
     private  LocalDateTime createdDate;
     private  LocalDateTime modifiedDate;
-    private  boolean blind;
+    private  boolean isBlind;
 
     private Article(Builder builder) {
         this.id = builder.id;
@@ -16,7 +16,7 @@ public class Article {
         this.body = builder.body;
         this.createdDate = builder.createdDate;
         this.modifiedDate = builder.modifiedDate;
-        this.blind = builder.blind;
+        this.isBlind = builder.isBlind;
     }
     private Article (){}
 
@@ -26,7 +26,7 @@ public class Article {
         private  String body;
         private  LocalDateTime createdDate;
         private  LocalDateTime modifiedDate;
-        private  boolean blind;
+        private  boolean isBlind;
 
         public Article build(){
             return new Article(this);
@@ -51,8 +51,8 @@ public class Article {
             this.modifiedDate = modifiedDate;
             return this;
         }
-        public Builder blind(boolean blind){
-            this.blind = blind;
+        public Builder isBlind(boolean blind){
+            this.isBlind = blind;
             return this;
         }
     }
@@ -77,6 +77,6 @@ public class Article {
     }
 
     public boolean isBlind() {
-        return this.blind;
+        return this.isBlind;
     }
 }
