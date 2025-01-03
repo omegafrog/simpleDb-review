@@ -1,6 +1,7 @@
 package org.example.simpleDb;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.example.Article;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -89,8 +90,28 @@ public class Sql {
         return new ArrayList<>();
     }
 
-    public <T> List<T> selectRows(Class<T> className) {
-        return null;
+    public  List<Article> selectRows(Class<?> className) {
+        List<Article> rows = new ArrayList<>();
+        try (PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
+            addArgs(pstmt);
+
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                rows.add(new Article.Builder()
+                                .id(rs.getLong("id"))
+                                .title(rs.getString("title"))
+                                .body(rs.getString("body"))
+                                .createdDate(rs.getTimestamp("createdDate").toLocalDateTime())
+                                .modifiedDate(rs.getTimestamp("modifiedDate").toLocalDateTime())
+                                .isBlind(rs.getBoolean("isBlind"))
+                                .build()
+                );
+            }
+            return rows;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return rows;
     }
 
     public Map<String, Object> selectRow() {
@@ -114,7 +135,8 @@ public class Sql {
         return null;
     }
 
-    public <T> T selectRow(Class<T> className) {
+    public  Article selectRow(Class<?> className) {
+
         return null;
     }
 
@@ -190,9 +212,6 @@ public class Sql {
 
     private void addArgs(PreparedStatement pstmt) throws SQLException {
         for (int i = 0; i < argsList.size(); i++) {
-            if(argsList.get(i) instanceof List arg)
-                pstmt.setArray(i+1, conn.createArrayOf(arg.get(0).getClass().getTypeName(),arg.toArray()));
-
             pstmt.setObject(i + 1, argsList.get(i));
         }
     }

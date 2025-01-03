@@ -20,7 +20,7 @@ public class Article {
     }
     private Article (){}
 
-    private final static class Builder{
+    public final static class Builder{
         private  Long id;
         private  String title;
         private  String body;
@@ -31,7 +31,7 @@ public class Article {
         public Article build(){
             return new Article(this);
         }
-        public Builder id(Long id) {
+        public  Builder id(Long id) {
             this.id = id;
             return this;
         }
