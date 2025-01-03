@@ -116,6 +116,14 @@ public class Sql {
     }
 
     public Long selectLong() {
+        try(Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery(s.toString());
+            while(rs.next()){
+                return rs.getLong(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
