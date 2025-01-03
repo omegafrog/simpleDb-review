@@ -136,7 +136,23 @@ public class Sql {
     }
 
     public  Article selectRow(Class<?> className) {
+        try (PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
+            addArgs(pstmt);
 
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                return new Article.Builder()
+                        .id(rs.getLong("id"))
+                        .title(rs.getString("title"))
+                        .body(rs.getString("body"))
+                        .createdDate(rs.getTimestamp("createdDate").toLocalDateTime())
+                        .modifiedDate(rs.getTimestamp("modifiedDate").toLocalDateTime())
+                        .isBlind(rs.getBoolean("isBlind"))
+                        .build();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -192,7 +208,9 @@ public class Sql {
     public Sql appendIn(String statement, Object... args) {
         s.append(statement).append(" ");
         int idx = s.lastIndexOf("?");
-        s.replace(idx, idx + 1, String.join(", ",Arrays.stream(args).map(String::valueOf).toList()));
+        s.replace(idx, idx + 1, String.join(", ",Arrays.stream(args).map(
+                arg-> "\"" + arg + "\""
+        ).toList()));
         return this;
     }
 

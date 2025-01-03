@@ -18,7 +18,7 @@ public class SimpleDb {
             .registerModule(new JavaTimeModule());
 
     public SimpleDb(String localhost, String username, String password, String schema) throws SQLException {
-        conn = DriverManager.getConnection(DB_URL+localhost+"/"+schema, username, password);
+        conn = DriverManager.getConnection(DB_URL + localhost + "/" + schema, username, password);
     }
 
     public void setDevMode(boolean mode) {
@@ -26,13 +26,13 @@ public class SimpleDb {
     }
 
     public void run(String statement, Object... args) {
-        try(PreparedStatement pstmt = conn.prepareStatement(statement)) {
+        try (PreparedStatement pstmt = conn.prepareStatement(statement)) {
             List<Object> argsList = Arrays.asList(args);
-            if(argsList.isEmpty() || argsList.size()!=args.length)
+            if (argsList.isEmpty() || argsList.size() != args.length)
                 throw new IllegalArgumentException("인수가 잘못 입력되었습니다.");
 
-            for(int i = 0; i < argsList.size(); i++)
-                pstmt.setObject(i+1, args[i]);
+            for (int i = 0; i < argsList.size(); i++)
+                pstmt.setObject(i + 1, args[i]);
 
             pstmt.execute();
 
@@ -40,10 +40,11 @@ public class SimpleDb {
             e.printStackTrace();
         }
     }
-    public void run(String statement){
-        try(Statement stmt = conn.createStatement()) {
+
+    public void run(String statement) {
+        try (Statement stmt = conn.createStatement()) {
             stmt.execute(statement);
-        }catch(SQLException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -53,16 +54,34 @@ public class SimpleDb {
     }
 
     public void close() {
-        
+        try {
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void startTransaction() {
-        
+        try {
+            conn.setAutoCommit(false);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void rollback() {
+        try {
+            conn.rollback();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void commit() {
+        try {
+            conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
