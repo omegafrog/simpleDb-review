@@ -32,8 +32,7 @@ public class Sql {
     public long insert() {
         int id = 0;
         try (PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
-            for (int i = 0; i < argsList.size(); i++)
-                pstmt.setObject(i + 1, argsList.get(i));
+            addArgs(pstmt);
 
             id = pstmt.executeUpdate();
 
@@ -46,8 +45,7 @@ public class Sql {
     public int update() {
         int rowCnt = 0;
         try (PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
-            for (int i = 0; i < argsList.size(); i++)
-                pstmt.setObject(i + 1, argsList.get(i));
+            addArgs(pstmt);
 
             rowCnt = pstmt.executeUpdate();
 
@@ -60,8 +58,7 @@ public class Sql {
     public int delete() {
         int rowCnt = 0;
         try (PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
-            for (int i = 0; i < argsList.size(); i++)
-                pstmt.setObject(i + 1, argsList.get(i));
+            addArgs(pstmt);
 
             rowCnt = pstmt.executeUpdate();
 
@@ -73,8 +70,7 @@ public class Sql {
 
     public List<Map<String, Object>> selectRows() {
         try (PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
-            for (int i = 0; i < argsList.size(); i++)
-                pstmt.setObject(i + 1, argsList.get(i));
+            addArgs(pstmt);
 
             ResultSet rs = pstmt.executeQuery();
             List<Map<String, Object>> rows = new ArrayList<>();
@@ -99,8 +95,7 @@ public class Sql {
 
     public Map<String, Object> selectRow() {
         try (PreparedStatement pstmt = conn.prepareStatement(s.toString())) {
-            for (int i = 0; i < argsList.size(); i++)
-                pstmt.setObject(i + 1, argsList.get(i));
+            addArgs(pstmt);
 
             ResultSet rs = pstmt.executeQuery();
             Map<String, Object> row = new HashMap<>();
@@ -137,8 +132,7 @@ public class Sql {
 
     public Long selectLong() {
         try (PreparedStatement stmt = conn.prepareStatement(s.toString())) {
-            for (int i = 0; i < argsList.size(); i++)
-                stmt.setObject(i + 1, argsList.get(i));
+            addArgs(stmt);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 return rs.getLong(1);
@@ -179,5 +173,14 @@ public class Sql {
 
     public List<Long> selectLongs() {
         return null;
+    }
+
+    private void addArgs(PreparedStatement pstmt) throws SQLException {
+        for (int i = 0; i < argsList.size(); i++) {
+            if(argsList.get(i) instanceof List arg)
+                pstmt.setArray(i+1, conn.createArrayOf(arg.get(0).getClass().getTypeName(),arg.toArray()));
+
+            pstmt.setObject(i + 1, argsList.get(i));
+        }
     }
 }
