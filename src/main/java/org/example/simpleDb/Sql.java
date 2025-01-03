@@ -105,7 +105,7 @@ public class Sql {
 
     public LocalDateTime selectDatetime() {
         try(Statement stmt = conn.createStatement()) {
-            ResultSet rs = stmt.executeQuery("SELECT NOW();");
+            ResultSet rs = stmt.executeQuery(s.toString());
             while(rs.next()){
                 return rs.getTimestamp(1).toLocalDateTime();
             }
