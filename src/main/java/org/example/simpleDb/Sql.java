@@ -24,7 +24,7 @@ public class Sql {
     }
 
     public Sql append(String statement, Object... args) {
-        s.append(statement);
+        s.append(statement).append(" ");
         argsList.addAll(Arrays.asList(args));
         return this;
     }
