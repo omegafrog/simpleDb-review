@@ -136,8 +136,10 @@ public class Sql {
     }
 
     public Long selectLong() {
-        try (Statement stmt = conn.createStatement()) {
-            ResultSet rs = stmt.executeQuery(s.toString());
+        try (PreparedStatement stmt = conn.prepareStatement(s.toString())) {
+            for (int i = 0; i < argsList.size(); i++)
+                stmt.setObject(i + 1, argsList.get(i));
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 return rs.getLong(1);
             }
