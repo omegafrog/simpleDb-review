@@ -175,7 +175,17 @@ public class Sql {
     }
 
     public List<Long> selectLongs() {
-        return null;
+        List<Long> res = new ArrayList<>();
+        try (PreparedStatement stmt = conn.prepareStatement(s.toString())) {
+            addArgs(stmt);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                res.add(rs.getLong(1));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return res;
     }
 
     private void addArgs(PreparedStatement pstmt) throws SQLException {
