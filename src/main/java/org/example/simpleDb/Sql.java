@@ -168,7 +168,10 @@ public class Sql {
     }
 
     public Sql appendIn(String statement, Object... args) {
-        return null;
+        s.append(statement).append(" ");
+        int idx = s.lastIndexOf("?");
+        s.replace(idx, idx + 1, String.join(", ",Arrays.stream(args).map(String::valueOf).toList()));
+        return this;
     }
 
     public List<Long> selectLongs() {
