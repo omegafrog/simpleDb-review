@@ -10,15 +10,22 @@ import java.util.List;
 
 public class SimpleDb {
     private final static String DB_URL = "jdbc:mysql://";
-    private final static List<Connection> connList = new ArrayList<>();
-    private final static Integer MAX_CONNECTION = 10;
-    private final Connection conn;
+    private final String hostName;
+    private final String username;
+    private final String password;
+    private final String schema;
+    private  Connection conn;
+    private boolean autoCommit = true;
     private boolean devMode = false;
     private final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule());
 
-    public SimpleDb(String localhost, String username, String password, String schema) throws SQLException {
-        conn = DriverManager.getConnection(DB_URL + localhost + "/" + schema, username, password);
+    public SimpleDb(String hostName, String username, String password, String schema) throws SQLException {
+        this.hostName = hostName;
+        this.username = username;
+        this.password = password;
+        this.schema = schema;
+        conn = DriverManager.getConnection(DB_URL + hostName + "/" + schema, username, password);
     }
 
     public void setDevMode(boolean mode) {
@@ -26,7 +33,10 @@ public class SimpleDb {
     }
 
     public void run(String statement, Object... args) {
-        try (PreparedStatement pstmt = conn.prepareStatement(statement)) {
+        PreparedStatement pstmt=null;
+        try  {
+            getConnection();
+            pstmt = conn.prepareStatement(statement);
             List<Object> argsList = Arrays.asList(args);
             if (argsList.isEmpty() || argsList.size() != args.length)
                 throw new IllegalArgumentException("인수가 잘못 입력되었습니다.");
@@ -35,14 +45,21 @@ public class SimpleDb {
                 pstmt.setObject(i + 1, args[i]);
 
             pstmt.execute();
-
+            pstmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
+    private synchronized void getConnection() throws SQLException {
+        conn = DriverManager.getConnection(DB_URL + hostName + "/" + schema, username, password);
+        conn.setAutoCommit(autoCommit);
+    }
+
     public void run(String statement) {
-        try (Statement stmt = conn.createStatement()) {
+        try  {
+            getConnection();
+            Statement stmt = conn.createStatement();
             stmt.execute(statement);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -50,7 +67,13 @@ public class SimpleDb {
     }
 
     public Sql genSql() {
-        return new Sql(this.conn, this.objectMapper);
+        try{
+            getConnection();
+            return new Sql(conn, this.objectMapper);
+        }catch (SQLException e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void close() {
@@ -63,6 +86,7 @@ public class SimpleDb {
 
     public void startTransaction() {
         try {
+            autoCommit = false;
             conn.setAutoCommit(false);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -72,6 +96,7 @@ public class SimpleDb {
     public void rollback() {
         try {
             conn.rollback();
+            autoCommit = true;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -80,6 +105,7 @@ public class SimpleDb {
     public void commit() {
         try {
             conn.commit();
+            autoCommit = true;
         } catch (SQLException e) {
             e.printStackTrace();
         }

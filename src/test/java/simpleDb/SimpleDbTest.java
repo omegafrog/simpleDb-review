@@ -514,6 +514,7 @@ public class SimpleDbTest {
     @Test
     @DisplayName("commit")
     public void t019() {
+        System.out.println("start");
         // SimpleDB에서 SQL 객체를 생성합니다.
         long oldCount = simpleDb.genSql()
                 .append("SELECT COUNT(*)")
